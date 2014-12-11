@@ -22,6 +22,30 @@ var assembleRender = require('assemble-render');
 ```
 
 ## API
+### [.renderPlugin](index.js#L31)
+
+Assemble renderer plugin used to render templates passed through the stream.
+
+```js
+var assemble = require('assemble');
+var renderPlugin = require('assemble-render');
+```
+
+### [.render](index.js#L51)
+
+Create a stream that will render files with assemble.
+
+* `options` **{Object}**: Additional options to use.    
+* `locals` **{Object}**: Additional locals to pass to the renderer.    
+* `returns` **{Stream}**: Stream compatible with Assemble pipelines  
+
+```js
+var render = renderPlugin(assemble);
+assemble.task('build-posts', function () {
+  assemble.src('*.hbs')
+    .pipe(render());
+});
+```
 
 
 ## Contributing

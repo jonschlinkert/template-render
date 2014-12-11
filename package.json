@@ -26,8 +26,15 @@
     "test": "mocha -R spec"
   },
   "devDependencies": {
+    "assemble": "git://github.com/assemble/assemble#v0.6.0",
+    "assemble-push": "^0.1.1",
     "mocha": "*",
     "should": "*"
   },
-  "keywords": []
+  "keywords": [],
+  "dependencies": {
+    "gulp-util": "^3.0.1",
+    "lodash": "^2.4.1",
+    "through2": "^0.6.3"
+  }
 }
