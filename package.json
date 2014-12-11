@@ -1,0 +1,33 @@
+{
+  "name": "assemble-render",
+  "description": "Plugin for Assemble, Verb, and Gulp to render files.",
+  "version": "0.1.0",
+  "homepage": "https://github.com/assemble/assemble-render",
+  "author": {
+    "name": "Brian Woodward",
+    "url": "https://github.com/doowb"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/assemble/assemble-render.git"
+  },
+  "bugs": {
+    "url": "https://github.com/assemble/assemble-render/issues"
+  },
+  "license": {
+    "type": "MIT",
+    "url": "https://github.com/assemble/assemble-render/blob/master/LICENSE-MIT"
+  },
+  "main": "index.js",
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "scripts": {
+    "test": "mocha -R spec"
+  },
+  "devDependencies": {
+    "mocha": "*",
+    "should": "*"
+  },
+  "keywords": []
+}
