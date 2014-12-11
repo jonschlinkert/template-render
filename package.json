@@ -1,6 +1,6 @@
 {
   "name": "assemble-render",
-  "description": "Plugin for Assemble, Verb, and Gulp to render files.",
+  "description": "Plugin for rendering files in an assemble pipeline.",
   "version": "0.1.0",
   "homepage": "https://github.com/assemble/assemble-render",
   "author": {

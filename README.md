@@ -1,6 +1,6 @@
 # assemble-render [![NPM version](https://badge.fury.io/js/assemble-render.svg)](http://badge.fury.io/js/assemble-render)
 
-> Plugin for Assemble, Verb, and Gulp to render files.
+> Plugin for rendering files in an assemble pipeline.
 
 ## Install
 ## Install with [npm](npmjs.org)
