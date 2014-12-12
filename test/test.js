@@ -6,7 +6,7 @@ var assemble = require('assemble');
 var push = require('assemble-push')(assemble);
 var render = require('../')(assemble);
 
-describe('assemble-render', function () {
+describe('template-render', function () {
   assemble.create('item', function () {
     return {
       one: { path: 'one.hbs', content: '---\nmsg: hello one\n---\n1: {{ msg }}' },

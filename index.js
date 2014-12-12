@@ -1,5 +1,5 @@
 /*!
- * assemble-render <https://github.com/assemble/assemble-render>
+ * template-render <https://github.com/assemble/template-render>
  *
  * Copyright (c) 2014 Brian Woodward, contributors.
  * Licensed under the MIT license.
@@ -17,48 +17,48 @@ var path = require('path');
 var _ = require('lodash');
 
 /**
- * Assemble renderer plugin used to render templates passed through the stream.
+ * Template renderer plugin used to render templates passed through the stream.
  *
  * ```js
- * var assemble = require('assemble');
- * var renderPlugin = require('assemble-render');
+ * var app = require('assemble');
+ * var renderPlugin = require('template-render');
  * ```
  *
  * @name  renderPlugin
  * @api public
  */
 
-module.exports = function renderPlugin (assemble) {
+module.exports = function renderPlugin (app) {
 
   /**
-   * Create a stream that will render files with assemble.
+   * Create a stream that will render files with template.
    *
    * ```js
-   * var render = renderPlugin(assemble);
-   * assemble.task('build-posts', function () {
-   *   assemble.src('*.hbs')
+   * var render = renderPlugin(app);
+   * app.task('build-posts', function () {
+   *   app.src('*.hbs')
    *     .pipe(render());
    * });
    * ```
    *
    * @param  {Object} `options` Additional options to use.
    * @param  {Object} `locals` Additional locals to pass to the renderer.
-   * @return {Stream} Stream compatible with Assemble pipelines
+   * @return {Stream} Stream compatible with Assemble, Vinyl, or Gulp pipelines
    * @name  render
    * @api public
    */
 
   return function render (options, locals) {
 
-    var session = assemble.session;
-    var opts = _.extend({}, assemble.options, options);
+    var session = app.session;
+    var opts = _.extend({}, app.options, options);
     locals = locals || {};
     locals.options = _.extend({}, locals.options, opts);
 
     // get the custom template type created for this task
     var taskName = session.get('task name');
     var templateType = 'page';
-    var buildKey = assemble.option('renameKey') || function (fp) {
+    var buildKey = app.option('renameKey') || function (fp) {
       return path.basename(fp, path.extname(fp));
     };
 
@@ -71,7 +71,7 @@ module.exports = function renderPlugin (assemble) {
       };
     }
 
-    var plural = assemble.collection[templateType];
+    var plural = app.collection[templateType];
     var renderables = session.get('renderables') || [];
     renderables = renderables.concat([plural]).filter(Boolean);
 
@@ -90,7 +90,7 @@ module.exports = function renderPlugin (assemble) {
       }
 
       if (file.isStream()) {
-        this.emit('error', new gutil.PluginError('assemble-plugin:render', 'Streaming is not supported.'));
+        this.emit('error', new gutil.PluginError('template-plugin:render', 'Streaming is not supported.'));
         return cb();
       }
 
@@ -99,10 +99,10 @@ module.exports = function renderPlugin (assemble) {
         var stream = this;
         var key = buildKey(file.path);
         var template = renderables.map(function(type) {
-          return assemble.views[type][key];
+          return app.views[type][key];
         }).filter(Boolean);
 
-        template = template.length === 0 ? assemble.views.pages[key] : template[0];
+        template = template.length === 0 ? app.views.pages[key] : template[0];
         if (!template) {
           stream.push(file);
           return cb();
@@ -115,7 +115,7 @@ module.exports = function renderPlugin (assemble) {
         // render the template template with the given locals
         template.render(locals, function(err, content) {
           if (err) {
-            stream.emit('error', new gutil.PluginError('assemble-render', err));
+            stream.emit('error', new gutil.PluginError('template-render', err));
             cb(err);
             return;
           }
@@ -128,7 +128,7 @@ module.exports = function renderPlugin (assemble) {
         });
 
       } catch (err) {
-        this.emit('error', new gutil.PluginError('assemble-render', err));
+        this.emit('error', new gutil.PluginError('template-render', err));
         return cb();
       }
     });
