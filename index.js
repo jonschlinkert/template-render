@@ -6,7 +6,7 @@ var gutil = require('gulp-util');
 var path = require('path');
 
 module.exports = function renderPlugin (app, config) {
-  config = extend({prefix: '__task__', session: 'task name'});
+  config = extend({prefix: '__task__', name: 'task name'});
 
   return function render (options, locals) {
     var session = app.session;
@@ -16,19 +16,19 @@ module.exports = function renderPlugin (app, config) {
     locals.options = extend({}, locals.options, opts);
 
     // get the custom template type created for this task
-    var taskName = session.get(config.session);
     var type = 'page';
-    var renameKey = app.option('renameKey') || function (fp) {
+    var taskName = session.get(config.name);
+    var renameFn = function (fp) {
       return path.basename(fp, path.extname(fp));
     };
+
+    var renameKey = app.option('renameKey') || renameFn;
 
     // create a custom template type based on the task name to keep
     // source templates separate.
     if (taskName) {
       type = prefix + taskName;
-      renameKey = function (fp) {
-        return path.basename(fp, path.extname(fp));
-      };
+      renameKey = renameFn;
     }
 
     var templates = [app.collection[type]];
