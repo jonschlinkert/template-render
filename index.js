@@ -1,87 +1,42 @@
-/*!
- * template-render <https://github.com/assemble/template-render>
- *
- * Copyright (c) 2014 Brian Woodward, contributors.
- * Licensed under the MIT license.
- */
-
 'use strict';
 
-/**
- * Module dependencies.
- */
-
+var extend = require('extend-shallow');
 var through = require('through2');
 var gutil = require('gulp-util');
 var path = require('path');
-var _ = require('lodash');
 
-/**
- * Template renderer plugin used to render templates passed through the stream.
- *
- * ```js
- * var app = require('assemble');
- * var renderPlugin = require('template-render');
- * ```
- *
- * @name  renderPlugin
- * @api public
- */
-
-module.exports = function renderPlugin (app) {
-
-  /**
-   * Create a stream that will render files with template.
-   *
-   * ```js
-   * var render = renderPlugin(app);
-   * app.task('build-posts', function () {
-   *   app.src('*.hbs')
-   *     .pipe(render());
-   * });
-   * ```
-   *
-   * @param  {Object} `options` Additional options to use.
-   * @param  {Object} `locals` Additional locals to pass to the renderer.
-   * @return {Stream} Stream compatible with Assemble, Vinyl, or Gulp pipelines
-   * @name  render
-   * @api public
-   */
+module.exports = function renderPlugin (app, config) {
+  config = extend({prefix: '__task__', session: 'task name'});
 
   return function render (options, locals) {
-
     var session = app.session;
-    var opts = _.extend({}, app.options, options);
+    var opts = extend({}, app.options, options);
+
     locals = locals || {};
-    locals.options = _.extend({}, locals.options, opts);
+    locals.options = extend({}, locals.options, opts);
 
     // get the custom template type created for this task
-    var taskName = session.get('task name');
-    var templateType = 'page';
-    var buildKey = app.option('renameKey') || function (fp) {
+    var taskName = session.get(config.session);
+    var type = 'page';
+    var renameKey = app.option('renameKey') || function (fp) {
       return path.basename(fp, path.extname(fp));
     };
 
     // create a custom template type based on the task name to keep
     // source templates separate.
     if (taskName) {
-      templateType = '__task__' + taskName;
-      buildKey = function (fp) {
+      type = prefix + taskName;
+      renameKey = function (fp) {
         return path.basename(fp, path.extname(fp));
       };
     }
 
-    var plural = app.collection[templateType];
-    var renderables = session.get('renderables') || [];
-    renderables = renderables.concat([plural]).filter(Boolean);
+    var templates = [app.collection[type]];
 
-    /**
-     * Actual render stream used in a pipeline.
-     *
-     * @param  {Object} `file` Vinyl File Object from the current stream.
-     * @param  {Object} `enc` `file.contents` encoding.
-     * @param  {Function} `cb` Callback to indicate when the transform function is complete.
-     */
+    var pushed = session.get('renderables');
+    if (pushed) {
+      templates = templates.concat(pushed);
+    }
 
     return through.obj(function(file, encoding, cb) {
       if (file.isNull()) {
@@ -90,19 +45,23 @@ module.exports = function renderPlugin (app) {
       }
 
       if (file.isStream()) {
-        this.emit('error', new gutil.PluginError('template-plugin:render', 'Streaming is not supported.'));
+        this.emit('error', new gutil.PluginError('template-render', 'Streaming is not supported.'));
         return cb();
       }
 
       try {
-        // find the template associated with the vinyl file
         var stream = this;
-        var key = buildKey(file.path);
-        var template = renderables.map(function(type) {
+        var key = renameKey(file.path);
+
+        // find the template associated with the vinyl file
+        var template = templates.map(function(type) {
           return app.views[type][key];
         }).filter(Boolean);
 
-        template = template.length === 0 ? app.views.pages[key] : template[0];
+        template = template.length === 0
+          ? app.views.pages[key]
+          : template[0];
+
         if (!template) {
           stream.push(file);
           return cb();
