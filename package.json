@@ -1,6 +1,6 @@
 {
   "name": "template-render",
-  "description": "Plugin for rendering vinyl files in an assemble, verb, or gulp pipeline.",
+  "description": "Plugin for Template for rendering vinyl files in an assemble, verb, or gulp pipeline.",
   "version": "0.1.0",
   "homepage": "https://github.com/assemble/template-render",
   "author": {
@@ -25,16 +25,28 @@
   "scripts": {
     "test": "mocha -R spec"
   },
+  "dependencies": {
+    "extend-shallow": "^0.2.0",
+    "gulp-util": "^3.0.1",
+    "through2": "^0.6.3"
+  },
   "devDependencies": {
     "assemble": "git://github.com/assemble/assemble#v0.6.0",
     "assemble-push": "^0.1.1",
     "mocha": "*",
     "should": "*"
   },
-  "keywords": [],
-  "dependencies": {
-    "gulp-util": "^3.0.1",
-    "lodash": "^2.4.1",
-    "through2": "^0.6.3"
-  }
+  "keywords": [
+    "assemble",
+    "assembleplugin",
+    "file",
+    "gulp",
+    "plugin",
+    "render",
+    "renderer",
+    "rendering",
+    "template",
+    "verb",
+    "verbplugin"
+  ]
 }

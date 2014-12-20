@@ -7,15 +7,13 @@ var push = require('assemble-push')(assemble);
 var render = require('../')(assemble);
 
 describe('template-render', function () {
-  assemble.create('item', function () {
-    return {
-      one: { path: 'one.hbs', content: '---\nmsg: hello one\n---\n1: {{ msg }}' },
-      two: { path: 'two.hbs', content: '---\nmsg: hello two\n---\n2: {{ msg }}' },
-      three: { path: 'three.hbs', content: '---\nmsg: hello three\n---\n3: {{ msg }}' },
-      four: { path: 'four.hbs', content: '---\nmsg: hello four\n---\n4: {{ msg }}' }
-    };
+  assemble.create('item', {isRenderable: true});
+  assemble.items({
+    one: { path: 'one.hbs', content: '---\nmsg: hello one\n---\n1: {{ msg }}' },
+    two: { path: 'two.hbs', content: '---\nmsg: hello two\n---\n2: {{ msg }}' },
+    three: { path: 'three.hbs', content: '---\nmsg: hello three\n---\n3: {{ msg }}' },
+    four: { path: 'four.hbs', content: '---\nmsg: hello four\n---\n4: {{ msg }}' }
   });
-  assemble.items();
 
   it('should render default pages from `assemble.src`', function (done) {
     assemble.src('test/fixtures/*.hbs')
