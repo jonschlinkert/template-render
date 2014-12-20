@@ -27,7 +27,7 @@ module.exports = function renderPlugin (app, config) {
     // create a custom template type based on the task name to keep
     // source templates separate.
     if (taskName) {
-      type = prefix + taskName;
+      type = config.prefix + taskName;
       renameKey = renameFn;
     }
 
