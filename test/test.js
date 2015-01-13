@@ -3,20 +3,28 @@
 var should = require('should');
 var through = require('through2');
 var assemble = require('assemble');
-var push = require('assemble-push')(assemble);
-var render = require('../')(assemble);
+var Push = require('assemble-push');
+var Render = require('../');
 
 describe('template-render', function () {
-  assemble.create('item', {isRenderable: true});
-  assemble.items({
-    one: { path: 'one.hbs', content: '---\nmsg: hello one\n---\n1: {{ msg }}' },
-    two: { path: 'two.hbs', content: '---\nmsg: hello two\n---\n2: {{ msg }}' },
-    three: { path: 'three.hbs', content: '---\nmsg: hello three\n---\n3: {{ msg }}' },
-    four: { path: 'four.hbs', content: '---\nmsg: hello four\n---\n4: {{ msg }}' }
+  var app = null;
+  var push = null;
+  var render = null;
+  beforeEach(function () {
+    app = assemble.init();
+    push = Push(app);
+    render = Render(app);
+    app.create('item', {isRenderable: true});
+    app.items({
+      one: { path: 'one.hbs', content: '---\nmsg: hello one\n---\n1: {{ msg }}' },
+      two: { path: 'two.hbs', content: '---\nmsg: hello two\n---\n2: {{ msg }}' },
+      three: { path: 'three.hbs', content: '---\nmsg: hello three\n---\n3: {{ msg }}' },
+      four: { path: 'four.hbs', content: '---\nmsg: hello four\n---\n4: {{ msg }}' }
+    });
   });
 
   it('should render default pages from `assemble.src`', function (done) {
-    assemble.src('test/fixtures/*.hbs')
+    app.src('test/fixtures/*.hbs')
       .pipe(render())
       .on('data', function (file) {
         file.contents.toString().should.eql('test: hello test');
@@ -46,5 +54,20 @@ describe('template-render', function () {
       })
       .on('error', done)
       .on('end', done);
+  });
+
+  it('should render pages loaded with custom renameKey', function (done) {
+    app.option('renameKey', function (fp) {
+      return fp;
+    });
+    app.task('test', function () {
+      return app.src('test/fixtures/*.hbs')
+        .pipe(render())
+        .on('data', function (file) {
+          file.contents.toString().should.eql('test: hello test');
+        });
+    });
+    app.task('default', ['test'], function () { done(); });
+    app.run('default');
   });
 });

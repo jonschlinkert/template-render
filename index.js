@@ -28,7 +28,6 @@ module.exports = function renderPlugin (app, config) {
     // source templates separate.
     if (taskName) {
       type = config.prefix + taskName;
-      renameKey = renameFn;
     }
 
     var templates = [app.collection[type]];
