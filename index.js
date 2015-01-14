@@ -30,7 +30,8 @@ module.exports = function renderPlugin (app, config) {
       type = config.prefix + taskName;
     }
 
-    var templates = [app.collection[type]];
+    var plural = app.collection[type];
+    var templates = plural ? [plural] : [];
 
     var pushed = session.get('renderables');
     if (pushed) {
