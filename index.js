@@ -37,6 +37,7 @@ module.exports = function renderPlugin (app, config) {
     if (pushed) {
       templates = templates.concat(pushed);
     }
+    templates.reverse();
 
     return through.obj(function(file, encoding, cb) {
       if (file.isNull()) {
@@ -52,15 +53,8 @@ module.exports = function renderPlugin (app, config) {
       try {
         var stream = this;
         var key = renameKey(file.path);
-
-        // find the template associated with the vinyl file
-        var template = templates.map(function(type) {
-          return app.views[type][key];
-        }).filter(Boolean);
-
-        template = template.length === 0
-          ? app.views.pages[key]
-          : template[0];
+        var template = app.findRenderable(key, templates);
+        template = template || app.views.pages[key];
 
         if (!template) {
           stream.push(file);
