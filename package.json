@@ -1,7 +1,7 @@
 {
   "name": "template-render",
   "description": "Plugin for Template for rendering vinyl files in an assemble, verb, or gulp pipeline.",
-  "version": "0.3.2",
+  "version": "0.4.0",
   "homepage": "https://github.com/assemble/template-render",
   "author": {
     "name": "Brian Woodward",
