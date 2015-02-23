@@ -119,4 +119,24 @@ describe('template-render', function () {
     app.task('default', ['renameKey-test'], function () { done(); });
     app.run('default');
   });
+
+  it.only('should sync the path property if changed during rendering', function (done) {
+    app.preRender(/./, function (file, next) {
+      file.path = file.path.replace('.hbs', '.html');
+      next(null, file);
+    });
+
+    var origPath = null;
+    app.src('test/fixtures/*.hbs')
+      .on('data', function (file) {
+        origPath = file.path;
+      })
+      .pipe(render())
+      .on('data', function (file) {
+        file.contents.toString().should.eql('test: hello test\n');
+        file.path.should.eql(origPath.replace('.hbs', '.html'));
+      })
+      .on('error', done)
+      .on('end', done);
+  });
 });

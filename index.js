@@ -76,6 +76,9 @@ module.exports = function renderPlugin (app, config) {
           // update the vinyl file with the rendered contents
           // and push back into the stream.
           file.contents = new Buffer(content);
+          if (file.path !== template.path) {
+            file.path = template.path;
+          }
           stream.push(file);
           cb();
         });
