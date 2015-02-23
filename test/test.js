@@ -120,7 +120,7 @@ describe('template-render', function () {
     app.run('default');
   });
 
-  it.only('should sync the path property if changed during rendering', function (done) {
+  it('should sync the path property if changed during rendering', function (done) {
     app.preRender(/./, function (file, next) {
       file.path = file.path.replace('.hbs', '.html');
       next(null, file);
