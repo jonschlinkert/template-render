@@ -4,6 +4,7 @@ var should = require('should');
 var through = require('through2');
 var assemble = require('assemble');
 var Push = require('assemble-push');
+var extname = require('gulp-extname');
 var Render = require('../');
 
 describe('template-render', function () {
@@ -118,6 +119,24 @@ describe('template-render', function () {
     });
     app.task('default', ['renameKey-test'], function () { done(); });
     app.run('default');
+  });
+
+  it('should sync the path propety if changed in the pipeline before rendering', function (done) {
+    var origPath = null;
+    app.src('test/fixtures/*.hbs')
+      .on('data', function (file) {
+        origPath = file.path;
+      })
+      .pipe(extname())
+      .on('data', function (file) {
+        file.path.should.eql(origPath.replace('.hbs', '.html'));
+      })
+      .pipe(render())
+      .on('data', function (file) {
+        file.path.should.eql(origPath.replace('.hbs', '.html'));
+      })
+      .on('error', done)
+      .on('end', done);
   });
 
   it('should sync the path property if changed during rendering', function (done) {

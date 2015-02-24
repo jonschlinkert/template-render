@@ -64,6 +64,9 @@ module.exports = function renderPlugin (app, config) {
         // update the template information with any changes that might not have
         // been updated by reference while running through the stream
         template.content = file.contents.toString();
+        if (file.path !== template.path) {
+          template.path = file.path;
+        }
 
         // render the template template with the given locals
         template.render(locals, function(err, content) {

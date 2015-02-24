@@ -33,6 +33,7 @@
   "devDependencies": {
     "assemble": "git://github.com/assemble/assemble#v0.6.0",
     "assemble-push": "^0.1.1",
+    "gulp-extname": "^0.2.0",
     "mocha": "*",
     "should": "*"
   },
