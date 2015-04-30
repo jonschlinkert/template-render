@@ -1,7 +1,7 @@
 {
   "name": "template-render",
   "description": "Plugin for Template for rendering vinyl files in an assemble, verb, or gulp pipeline.",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "homepage": "https://github.com/assemble/template-render",
   "author": {
     "name": "Brian Woodward",
@@ -16,26 +16,29 @@
   },
   "license": {
     "type": "MIT",
-    "url": "https://github.com/assemble/template-render/blob/master/LICENSE-MIT"
+    "url": "https://github.com/assemble/template-render/blob/master/LICENSE"
   },
+  "files": [
+    "index.js"
+  ],
   "main": "index.js",
   "engines": {
     "node": ">=0.10.0"
   },
   "scripts": {
-    "test": "mocha -R spec"
+    "test": "mocha"
   },
   "dependencies": {
-    "extend-shallow": "^0.2.0",
-    "gulp-util": "^3.0.1",
+    "mixin-deep": "^1.1.0",
+    "plugin-error": "^0.1.0",
     "through2": "^0.6.3"
   },
   "devDependencies": {
     "assemble": "git://github.com/assemble/assemble#v0.6.0",
-    "assemble-push": "^0.1.1",
     "gulp-extname": "^0.2.0",
     "mocha": "*",
-    "should": "*"
+    "should": "*",
+    "template-push": "^0.1.1"
   },
   "keywords": [
     "assemble",
