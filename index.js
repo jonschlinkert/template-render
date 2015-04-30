@@ -1,95 +1,72 @@
 'use strict';
 
-var extend = require('extend-shallow');
+/**
+ * Module dependencies.
+ */
+
+var merge = require('mixin-deep');
+var PluginError = require('plugin-error');
 var through = require('through2');
-var gutil = require('gulp-util');
-var path = require('path');
 
-module.exports = function renderPlugin (app, config) {
-  config = extend({prefix: '__task__', name: 'task name'});
+/**
+ * Expose `render` plugin
+ */
 
-  return function render (options, locals) {
-    var session = app.session;
-    var opts = extend({}, app.options, options);
-
+module.exports = function(app, config) {
+  return function renderPlugin(locals, options) {
     locals = locals || {};
-    locals.options = extend({}, locals.options, opts);
+    locals.options = locals.options || {};
 
-    // get the custom template type created for this task
-    var type = 'page';
-    var taskName = session.get(config.name);
-    var renameFn = function (fp) {
-      return path.basename(fp, path.extname(fp));
-    };
-
-    var renameKey = app.option('renameKey') || renameFn;
-
-    // create a custom template type based on the task name to keep
-    // source templates separate.
-    if (taskName) {
-      type = config.prefix + taskName;
-    }
-
-    var plural = app.collection[type];
-    var templates = plural ? [plural] : [];
-
-    var pushed = session.get('renderables');
-    if (pushed) {
-      templates = templates.concat(pushed);
-    }
-    templates.reverse();
-
-    return through.obj(function(file, encoding, cb) {
+    return through.obj(function (file, enc, cb) {
       if (file.isNull()) {
         this.push(file);
         return cb();
       }
-
       if (file.isStream()) {
-        this.emit('error', new gutil.PluginError('template-render', 'Streaming is not supported.'));
+        this.emit('error', new PluginError('render-plugin', 'Streaming is not supported.'));
         return cb();
       }
 
+      locals = merge({}, locals, file.locals);
+      locals.options = merge({}, app.options, locals.options);
+
+      if (norender(app, file.ext, file, locals)) {
+        this.push(file);
+        return cb();
+      }
+
+      var template = app.getSessionFile(file);
+      template.content = file.contents.toString();
+
       try {
         var stream = this;
-        var key = renameKey(file.path);
-        var template = app.findRenderable(key, templates);
-        template = template || app.views.pages[key];
-
-        if (!template) {
-          stream.push(file);
-          return cb();
-        }
-
-        // update the template information with any changes that might not have
-        // been updated by reference while running through the stream
-        template.content = file.contents.toString();
-        if (file.path !== template.path) {
-          template.path = file.path;
-        }
-
-        // render the template template with the given locals
-        template.render(locals, function(err, content) {
+        template.render(locals, function (err, content) {
           if (err) {
-            stream.emit('error', new gutil.PluginError('template-render', err));
+            stream.emit('error', new PluginError('render-plugin', err));
             cb(err);
             return;
           }
-
-          // update the vinyl file with the rendered contents
-          // and push back into the stream.
           file.contents = new Buffer(content);
-          if (file.path !== template.path) {
-            file.path = template.path;
-          }
           stream.push(file);
-          cb();
+          return cb();
         });
 
       } catch (err) {
-        this.emit('error', new gutil.PluginError('template-render', err));
+        this.emit('error', new PluginError('render-plugin', err));
         return cb();
       }
     });
   };
-};
+}
+
+/**
+ * Push the `file` through if the user has specfied
+ * not to render it.
+ */
+
+function norender(app, ext, file, locals) {
+  return !app.engines.hasOwnProperty(ext)
+    || app.isTrue('norender') || app.isFalse('render')
+    || file.norender === true || file.render === false
+    || locals.norender === true || locals.render === false;
+}
