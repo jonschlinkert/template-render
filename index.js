@@ -35,7 +35,7 @@ module.exports = function(app, config) {
         return cb();
       }
 
-      var template = app.getSessionFile(file);
+      var template = app.getFile(file);
       template.content = file.contents.toString();
 
       try {
